@@ -60,7 +60,7 @@ function displayTransactionsTable(transactions) {
   transactions.forEach((tx) => {
     const typeColor = tx.type === 'income' ? chalk.green('+') : chalk.red('-');
     const amountColor = tx.type === 'income' ? chalk.green : chalk.red;
-    
+
     table.push([
       tx.date,
       tx.item,
@@ -83,11 +83,11 @@ function displayWalletSummary(db) {
   console.log(chalk.white(`Mata Uang       : ${db.currency}`));
   console.log(chalk.white(`Pendapatan/Bln  : Rp ${db.monthly_income.toLocaleString('id-ID')}`));
   console.log(chalk.green.bold(`Saldo Sekarang  : Rp ${db.current_balance.toLocaleString('id-ID')}`));
-  
+
   // Calculate income and expense
   let totalIncome = 0;
   let totalExpense = 0;
-  
+
   db.transactions.forEach((tx) => {
     if (tx.type === 'income') {
       totalIncome += tx.amount;
@@ -95,7 +95,7 @@ function displayWalletSummary(db) {
       totalExpense += tx.amount;
     }
   });
-  
+
   console.log(chalk.green(`Total Masuk     : Rp ${totalIncome.toLocaleString('id-ID')}`));
   console.log(chalk.red(`Total Keluar    : Rp ${totalExpense.toLocaleString('id-ID')}`));
   console.log(chalk.cyan.bold('═══════════════════════════════\n'));
@@ -104,7 +104,7 @@ function displayWalletSummary(db) {
 // Add income
 async function addIncome(db) {
   const incomeTypes = ['Ayah', 'Ibu', 'Gaji', 'Cashback', 'Hutang', 'Bonus', 'Lainnya'];
-  
+
   const answers = await inquirer.prompt([
     {
       type: 'list',
@@ -148,7 +148,7 @@ async function addIncome(db) {
 // Add expense
 async function addExpense(db) {
   const expenseCategories = ['Makan', 'Transportasi', 'Kosan', 'Belanja', 'Hiburan', 'Kesehatan', 'Lain-lain'];
-  
+
   const answers = await inquirer.prompt([
     {
       type: 'input',
@@ -259,10 +259,10 @@ async function viewDebt(db) {
   ]);
 
   if (answer.action === 'Lihat Hutang') {
-    const debts = db.transactions.filter(tx => 
+    const debts = db.transactions.filter(tx =>
       tx.type === 'expense' && (tx.category === 'Hutang' || tx.item.toLowerCase().includes('hutang'))
     );
-    
+
     if (debts.length === 0) {
       console.log(chalk.green('\n✓ Anda tidak memiliki hutang!\n'));
     } else {
@@ -331,7 +331,7 @@ async function editTransaction(db) {
   if (answer.transactionIdx === -1) return;
 
   const tx = db.transactions[answer.transactionIdx];
-  
+
   const editAnswer = await inquirer.prompt([
     {
       type: 'list',
@@ -348,9 +348,9 @@ async function editTransaction(db) {
     tx.item = name.item;
   } else if (editAnswer.field === 'Kategori') {
     const cat = await inquirer.prompt([
-      { 
-        type: 'list', 
-        name: 'category', 
+      {
+        type: 'list',
+        name: 'category',
         message: 'Kategori baru:',
         choices: ['Makan', 'Transportasi', 'Kosan', 'Belanja', 'Hiburan', 'Kesehatan', 'Lain-lain']
       }
@@ -359,9 +359,9 @@ async function editTransaction(db) {
   } else if (editAnswer.field === 'Nominal') {
     const oldAmount = tx.amount;
     const amount = await inquirer.prompt([
-      { 
-        type: 'number', 
-        name: 'amount', 
+      {
+        type: 'number',
+        name: 'amount',
         message: 'Nominal baru (Rp):',
         validate: (input) => input > 0 ? true : 'Jumlah harus lebih dari 0'
       }
