@@ -1,1774 +1,991 @@
 <!DOCTYPE html>
-<html lang="id-ID">
-
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Survival Bot 💸</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Unbounded:wght@400;700;900&display=swap"
-    rel="stylesheet">
-
-  <style>
-    :root {
-      --bg: #0b0c0e;
-      --surface: #111316;
-      --surface2: #18191d;
-      --border: #252629;
-      --text: #e8e6e1;
-      --muted: #5a5c61;
-      --income: #6ee89b;
-      --expense: #ff5f5f;
-      --accent: #f0c040;
-      --debt: #ff9f43;
-      --mono: 'IBM Plex Mono', monospace;
-      --display: 'Unbounded', sans-serif;
-    }
-
-    *,
-    *::before,
-    *::after {
-      -webkit-box-sizing: border-box;
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--mono);
-      min-height: 100vh;
-      font-size: 13px;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9999;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-      opacity: .25;
-    }
-
-    /* ── HEADER ── */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(11, 12, 14, .92);
-      -webkit-backdrop-filter: blur(14px);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-      justify-content: space-between;
-      height: 56px;
-      gap: 16px;
-    }
-
-    .logo {
-      font-family: var(--display);
-      font-size: .85rem;
-      font-weight: 900;
-      letter-spacing: -.02em;
-      white-space: nowrap;
-    }
-
-    .logo em {
-      color: var(--accent);
-      font-style: normal;
-    }
-
-    .header-meta {
-      font-size: .65rem;
-      color: var(--muted);
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-meta strong {
-      color: var(--text);
-    }
-
-    .header-actions {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      gap: 8px;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      justify-content: center;
-    }
-
-    .btn-sm {
-      font-family: var(--mono);
-      font-size: .65rem;
-      font-weight: 700;
-      padding: 5px 10px;
-      border-radius: 5px;
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      color: var(--text);
-      cursor: pointer;
-      letter-spacing: .04em;
-      -webkit-transition: all .15s;
-      -o-transition: all .15s;
-      transition: all .15s;
-      white-space: nowrap;
-    }
-
-    .btn-sm:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .btn-sm.danger {
-      border-color: var(--expense);
-      color: var(--expense);
-    }
-
-    .btn-sm.danger:hover {
-      background: var(--expense);
-      color: #fff;
-    }
-
-    /* ── SUMMARY ── */
-    .summary-strip {
-      display: -ms-grid;
-      display: grid;
-      -ms-grid-columns: (1fr)[4];
-      grid-template-columns: repeat(4, 1fr);
-      border-bottom: 1px solid var(--border);
-    }
-
-    @media (max-width: 700px) {
-      .summary-strip {
-        -ms-grid-columns: (1fr)[2];
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .stat-card {
-      padding: 20px 22px;
-      border-right: 1px solid var(--border);
-      -webkit-transition: background .2s;
-      -o-transition: background .2s;
-      transition: background .2s;
-    }
-
-    .stat-card:last-child {
-      border-right: none;
-    }
-
-    .stat-card:hover {
-      background: var(--surface);
-    }
-
-    .stat-label {
-      font-size: .6rem;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .stat-value {
-      font-family: var(--display);
-      font-size: 1rem;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-
-    .stat-value.green {
-      color: var(--income);
-    }
-
-    .stat-value.yellow {
-      color: var(--accent);
-    }
-
-    .stat-value.red {
-      color: var(--expense);
-    }
-
-    .stat-value.orange {
-      color: var(--debt);
-    }
-
-    .stat-sub {
-      font-size: .6rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    /* ── LAYOUT ── */
-    .layout {
-      display: -ms-grid;
-      display: grid;
-      -ms-grid-columns: 1fr 320px;
-      grid-template-columns: 1fr 320px;
-    }
-
-    @media (max-width: 800px) {
-      .layout {
-        -ms-grid-columns: 1fr;
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* ── TX PANEL ── */
-    .tx-panel {
-      border-right: 1px solid var(--border);
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-    }
-
-    .tx-toolbar {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-      justify-content: space-between;
-      padding: 12px 18px;
-      border-bottom: 1px solid var(--border);
-      gap: 10px;
-      -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-    }
-
-    .filter-pills {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      gap: 6px;
-      -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-    }
-
-    .pill {
-      font-family: var(--mono);
-      font-size: .6rem;
-      font-weight: 700;
-      letter-spacing: .06em;
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      -webkit-transition: all .15s;
-      -o-transition: all .15s;
-      transition: all .15s;
-    }
-
-    .pill.active {
-      background: var(--text);
-      color: var(--bg);
-      border-color: var(--text);
-    }
-
-    .pill.pill-income.active {
-      background: var(--income);
-      color: #000;
-      border-color: var(--income);
-    }
-
-    .pill.pill-expense.active {
-      background: var(--expense);
-      color: #fff;
-      border-color: var(--expense);
-    }
-
-    .pill.pill-hutang.active {
-      background: var(--debt);
-      color: #000;
-      border-color: var(--debt);
-    }
-
-    .tx-count {
-      font-size: .6rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .tx-list {
-      overflow-y: auto;
-    }
-
-    .tx-item {
-      display: -ms-grid;
-      display: grid;
-      -ms-grid-columns: 4px 14px 1fr 14px auto;
-      grid-template-columns: 4px 1fr auto;
-      gap: 14px;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      padding: 13px 18px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      -webkit-transition: background .12s;
-      -o-transition: background .12s;
-      transition: background .12s;
-      -webkit-animation: slideIn .25s ease both;
-      animation: slideIn .25s ease both;
-    }
-
-    .tx-item:hover {
-      background: var(--surface2);
-    }
-
-    .tx-item:last-child {
-      border-bottom: none;
-    }
-
-    @-webkit-keyframes slideIn {
-      from {
-        opacity: 0;
-        -webkit-transform: translateX(-8px);
-        transform: translateX(-8px);
-      }
-
-      to {
-        opacity: 1;
-        -webkit-transform: translateX(0);
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        -webkit-transform: translateX(-8px);
-        transform: translateX(-8px);
-      }
-
-      to {
-        opacity: 1;
-        -webkit-transform: translateX(0);
-        transform: translateX(0);
-      }
-    }
-
-    .tx-bar {
-      width: 3px;
-      height: 36px;
-      border-radius: 2px;
-    }
-
-    .tx-bar.income {
-      background: var(--income);
-      -webkit-box-shadow: 0 0 8px var(--income);
-      box-shadow: 0 0 8px var(--income);
-    }
-
-    .tx-bar.expense {
-      background: var(--expense);
-      -webkit-box-shadow: 0 0 8px var(--expense);
-      box-shadow: 0 0 8px var(--expense);
-    }
-
-    .tx-name {
-      font-size: .78rem;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      -o-text-overflow: ellipsis;
-      text-overflow: ellipsis;
-      max-width: 280px;
-    }
-
-    .tx-meta {
-      font-size: .6rem;
-      color: var(--muted);
-      margin-top: 3px;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      gap: 6px;
-      -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 1px 5px;
-      border-radius: 3px;
-      font-size: .55rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .tag.hutang {
-      border-color: var(--debt);
-      color: var(--debt);
-    }
-
-    .tag.lunas {
-      border-color: var(--income);
-      color: var(--income);
-    }
-
-    .tx-right {
-      text-align: right;
-    }
-
-    .tx-amount {
-      font-size: .8rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .tx-amount.income {
-      color: var(--income);
-    }
-
-    .tx-amount.expense {
-      color: var(--expense);
-    }
-
-    .tx-stars {
-      font-size: .55rem;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-      font-size: .75rem;
-      line-height: 1.8;
-    }
-
-    .empty-icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
-    }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-    }
-
-    .sidebar-section {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section-header {
-      padding: 11px 16px;
-      font-size: .6rem;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: var(--muted);
-      background: var(--surface);
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-      justify-content: space-between;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-    }
-
-    /* Form */
-    .form-body {
-      padding: 14px 16px;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .field label {
-      display: block;
-      font-size: .6rem;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    input[type=text],
-    input[type=number],
-    input[type=date],
-    select,
-    textarea {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: .75rem;
-      padding: 7px 10px;
-      outline: none;
-      -webkit-transition: border-color .15s;
-      -o-transition: border-color .15s;
-      transition: border-color .15s;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--accent);
-    }
-
-    select option {
-      background: var(--surface);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 54px;
-    }
-
-    .type-toggle {
-      display: -ms-grid;
-      display: grid;
-      -ms-grid-columns: 1fr 1fr;
-      grid-template-columns: 1fr 1fr;
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      overflow: hidden;
-    }
-
-    .type-btn {
-      padding: 7px 6px;
-      border: none;
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: .72rem;
-      font-weight: 700;
-      background: var(--bg);
-      color: var(--muted);
-      -webkit-transition: all .15s;
-      -o-transition: all .15s;
-      transition: all .15s;
-    }
-
-    .type-btn.on-income {
-      background: var(--income);
-      color: #000;
-    }
-
-    .type-btn.on-expense {
-      background: var(--expense);
-      color: #fff;
-    }
-
-    .form-row {
-      display: -ms-grid;
-      display: grid;
-      -ms-grid-columns: 1fr 8px 1fr;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .hutang-fields {
-      background: rgba(255, 159, 67, .06);
-      border: 1px solid rgba(255, 159, 67, .2);
-      border-radius: 6px;
-      padding: 10px;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .checkbox-row {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      gap: 8px;
-      font-size: .72rem;
-      cursor: pointer;
-    }
-
-    .checkbox-row input[type=checkbox] {
-      width: 14px;
-      height: 14px;
-      accent-color: var(--debt);
-    }
-
-    .btn-add {
-      width: 100%;
-      padding: 9px;
-      font-family: var(--mono);
-      font-weight: 700;
-      font-size: .75rem;
-      letter-spacing: .05em;
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      -webkit-transition: opacity .15s, -webkit-transform .1s;
-      transition: opacity .15s, -webkit-transform .1s;
-      -o-transition: opacity .15s, transform .1s;
-      transition: opacity .15s, transform .1s;
-      transition: opacity .15s, transform .1s, -webkit-transform .1s;
-    }
-
-    .btn-add:hover {
-      opacity: .85;
-    }
-
-    .btn-add:active {
-      -webkit-transform: scale(.98);
-      -ms-transform: scale(.98);
-      transform: scale(.98);
-    }
-
-    /* Cat breakdown */
-    .cat-list {
-      padding: 12px 16px;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cat-row {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .cat-name {
-      font-size: .65rem;
-      color: var(--muted);
-      width: 80px;
-      -ms-flex-negative: 0;
-      flex-shrink: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      -o-text-overflow: ellipsis;
-      text-overflow: ellipsis;
-    }
-
-    .cat-track {
-      -webkit-box-flex: 1;
-      -ms-flex: 1;
-      flex: 1;
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-    }
-
-    .cat-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: var(--expense);
-      -webkit-transition: width .5s ease;
-      -o-transition: width .5s ease;
-      transition: width .5s ease;
-    }
-
-    .cat-val {
-      font-size: .6rem;
-      font-weight: 700;
-      white-space: nowrap;
-      min-width: 46px;
-      text-align: right;
-    }
-
-    /* Debt list */
-    .debt-list {
-      padding: 10px 16px;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .debt-item {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-      justify-content: space-between;
-      -webkit-box-align: start;
-      -ms-flex-align: start;
-      align-items: flex-start;
-      padding: 8px 10px;
-      border: 1px solid rgba(255, 159, 67, .25);
-      border-radius: 6px;
-      background: rgba(255, 159, 67, .04);
-      -webkit-animation: slideIn .2s ease both;
-      animation: slideIn .2s ease both;
-    }
-
-    .debt-item.lunas {
-      border-color: rgba(110, 232, 155, .2);
-      background: rgba(110, 232, 155, .03);
-      opacity: .55;
-    }
-
-    .debt-name {
-      font-size: .72rem;
-      font-weight: 600;
-    }
-
-    .debt-sub {
-      font-size: .58rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .debt-right {
-      text-align: right;
-      -ms-flex-negative: 0;
-      flex-shrink: 0;
-    }
-
-    .debt-amt {
-      font-size: .72rem;
-      font-weight: 700;
-      color: var(--debt);
-    }
-
-    .debt-item.lunas .debt-amt {
-      color: var(--income);
-    }
-
-    .btn-lunas {
-      font-family: var(--mono);
-      font-size: .55rem;
-      font-weight: 700;
-      padding: 3px 7px;
-      border-radius: 3px;
-      border: 1px solid var(--debt);
-      color: var(--debt);
-      background: transparent;
-      cursor: pointer;
-      margin-top: 4px;
-      -webkit-transition: all .12s;
-      -o-transition: all .12s;
-      transition: all .12s;
-      display: block;
-    }
-
-    .btn-lunas:hover {
-      background: var(--debt);
-      color: #000;
-    }
-
-    /* ── MODAL ── */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .75);
-      -webkit-backdrop-filter: blur(6px);
-      backdrop-filter: blur(6px);
-      z-index: 200;
-      display: none;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .overlay.open {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-    }
-
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px;
-      max-width: 380px;
-      width: 100%;
-      -webkit-animation: popIn .2s ease both;
-      animation: popIn .2s ease both;
-    }
-
-    @-webkit-keyframes popIn {
-      from {
-        -webkit-transform: scale(.93);
-        transform: scale(.93);
-        opacity: 0;
-      }
-
-      to {
-        -webkit-transform: scale(1);
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    @keyframes popIn {
-      from {
-        -webkit-transform: scale(.93);
-        transform: scale(.93);
-        opacity: 0;
-      }
-
-      to {
-        -webkit-transform: scale(1);
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .modal-title {
-      font-family: var(--display);
-      font-size: .95rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      line-height: 1.3;
-    }
-
-    .modal-grid {
-      display: -ms-grid;
-      display: grid;
-      -ms-grid-columns: 1fr 10px 1fr;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .modal-field label {
-      display: block;
-      font-size: .58rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-
-    .modal-field p {
-      font-size: .75rem;
-    }
-
-    .modal-desc {
-      margin-bottom: 14px;
-    }
-
-    .modal-desc label {
-      display: block;
-      font-size: .58rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-
-    .modal-desc p {
-      font-size: .72rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .modal-actions {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-modal-close {
-      -webkit-box-flex: 1;
-      -ms-flex: 1;
-      flex: 1;
-      padding: 8px;
-      font-family: var(--mono);
-      font-size: .7rem;
-      background: var(--surface2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      cursor: pointer;
-      -webkit-transition: all .12s;
-      -o-transition: all .12s;
-      transition: all .12s;
-    }
-
-    .btn-modal-close:hover {
-      border-color: var(--text);
-    }
-
-    .btn-modal-delete {
-      -webkit-box-flex: 1;
-      -ms-flex: 1;
-      flex: 1;
-      padding: 8px;
-      font-family: var(--mono);
-      font-size: .7rem;
-      font-weight: 700;
-      background: transparent;
-      color: var(--expense);
-      border: 1px solid var(--expense);
-      border-radius: 5px;
-      cursor: pointer;
-      -webkit-transition: all .12s;
-      -o-transition: all .12s;
-      transition: all .12s;
-    }
-
-    .btn-modal-delete:hover {
-      background: var(--expense);
-      color: #fff;
-    }
-
-    /* ── IMPORT OVERLAY ── */
-    #import-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .9);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      z-index: 300;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .import-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px;
-      max-width: 420px;
-      width: 100%;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .import-title {
-      font-family: var(--display);
-      font-size: 1.1rem;
-      font-weight: 900;
-    }
-
-    .import-title em {
-      color: var(--accent);
-      font-style: normal;
-    }
-
-    .import-sub {
-      font-size: .7rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .drop-zone {
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      padding: 28px 20px;
-      text-align: center;
-      cursor: pointer;
-      -webkit-transition: all .2s;
-      -o-transition: all .2s;
-      transition: all .2s;
-      font-size: .75rem;
-      color: var(--muted);
-    }
-
-    .drop-zone:hover,
-    .drop-zone.drag {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .dz-icon {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-
-    .import-or {
-      text-align: center;
-      font-size: .65rem;
-      color: var(--muted);
-    }
-
-    .btn-fresh {
-      width: 100%;
-      padding: 10px;
-      font-family: var(--mono);
-      font-weight: 700;
-      font-size: .75rem;
-      background: var(--surface2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      cursor: pointer;
-      -webkit-transition: all .15s;
-      -o-transition: all .15s;
-      transition: all .15s;
-    }
-
-    .btn-fresh:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      -webkit-transform: translateX(-50%) translateY(60px);
-      -ms-transform: translateX(-50%) translateY(60px);
-      transform: translateX(-50%) translateY(60px);
-      background: var(--text);
-      color: var(--bg);
-      font-family: var(--mono);
-      font-size: .72rem;
-      font-weight: 700;
-      padding: 8px 18px;
-      border-radius: 20px;
-      z-index: 9000;
-      -webkit-transition: -webkit-transform .3s ease;
-      transition: -webkit-transform .3s ease;
-      -o-transition: transform .3s ease;
-      transition: transform .3s ease;
-      transition: transform .3s ease, -webkit-transform .3s ease;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
-    .toast.show {
-      -webkit-transform: translateX(-50%) translateY(0);
-      -ms-transform: translateX(-50%) translateY(0);
-      transform: translateX(-50%) translateY(0);
-    }
-
-    ::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 2px;
-    }
-  </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Survival Bot 💸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0b0c0e;
+    --surface:  #111316;
+    --surface2: #18191d;
+    --border:   #252629;
+    --text:     #e8e6e1;
+    --muted:    #5a5c61;
+    --income:   #6ee89b;
+    --expense:  #ff5f5f;
+    --accent:   #f0c040;
+    --debt:     #ff9f43;
+    --loan:     #5f9fff;
+    --mono:     'IBM Plex Mono', monospace;
+    --display:  'Unbounded', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    position: fixed;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    opacity: .25;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(11,12,14,.95);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 max(12px, env(safe-area-inset-left));
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px; gap: 8px;
+    flex-shrink: 0;
+  }
+  
+  .logo {
+    font-family: var(--display);
+    font-size: .75rem; font-weight: 900;
+    letter-spacing: -.02em; white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .logo em { color: var(--accent); font-style: normal; }
+  
+  .header-meta { 
+    font-size: .6rem; color: var(--muted); display: flex; align-items: center; gap: 8px;
+    flex: 1; min-width: 0; overflow: hidden;
+  }
+  .header-meta strong { color: var(--text); white-space: nowrap; }
+  
+  .header-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+  .btn-sm {
+    font-family: var(--mono); font-size: .6rem; font-weight: 700;
+    padding: 6px 10px; border-radius: 4px;
+    border: 1px solid var(--border); background: var(--surface2); color: var(--text);
+    cursor: pointer; letter-spacing: .04em; transition: all .15s; white-space: nowrap;
+    -webkit-user-select: none; user-select: none;
+  }
+  .btn-sm:active { opacity: .7; }
+  .btn-sm.danger { border-color: var(--expense); color: var(--expense); }
+
+  /* ── SUMMARY ── */
+  .summary-strip {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  @media (max-width: 700px) { .summary-strip { grid-template-columns: repeat(2,1fr); } }
+
+  .stat-card {
+    padding: 12px 10px;
+    border-right: 1px solid var(--border);
+    transition: background .2s;
+  }
+  .stat-card:last-child { border-right: none; }
+  .stat-card:active { background: var(--surface); }
+  .stat-label { font-size: .5rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 3px; }
+  .stat-value { font-family: var(--display); font-size: 1rem; font-weight: 700; line-height: 1.1; }
+  .stat-value.green  { color: var(--income); }
+  .stat-value.yellow { color: var(--accent); }
+  .stat-value.red    { color: var(--expense); }
+  .stat-value.orange { color: var(--debt); }
+  .stat-sub { font-size: .5rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: grid; grid-template-columns: 1fr 300px;
+    flex: 1; min-height: 0; overflow: hidden;
+  }
+  @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ── TX PANEL ── */
+  .tx-panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; min-height: 0; }
+  .tx-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; border-bottom: 1px solid var(--border); gap: 8px; flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .filter-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+  .pill {
+    font-family: var(--mono); font-size: .55rem; font-weight: 700; letter-spacing: .06em;
+    padding: 4px 8px; border-radius: 3px;
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    cursor: pointer; transition: all .15s; -webkit-user-select: none; user-select: none;
+  }
+  .pill.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .pill.pill-income.active  { background: var(--income); color: #000; border-color: var(--income); }
+  .pill.pill-expense.active { background: var(--expense); color: #fff; border-color: var(--expense); }
+  .pill.pill-hutang.active  { background: var(--debt); color: #000; border-color: var(--debt); }
+  .tx-count { font-size: .55rem; color: var(--muted); white-space: nowrap; }
+
+  .tx-list { overflow-y: auto; flex: 1; }
+
+  .tx-item {
+    display: grid; grid-template-columns: 3px 1fr auto;
+    gap: 10px; align-items: center;
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background .12s;
+    animation: slideIn .25s ease both;
+  }
+  .tx-item:active { background: var(--surface2); }
+  .tx-item:last-child { border-bottom: none; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .tx-bar { width: 3px; height: 32px; border-radius: 1px; }
+  .tx-bar.income  { background: var(--income); box-shadow: 0 0 6px var(--income); }
+  .tx-bar.expense { background: var(--expense); box-shadow: 0 0 6px var(--expense); }
+  .tx-bar.hutang  { background: var(--debt); box-shadow: 0 0 6px var(--debt); }
+  .tx-bar.pinjam  { background: var(--loan); box-shadow: 0 0 6px var(--loan); }
+
+  .tx-name {
+    font-size: .7rem; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tx-meta { font-size: .55rem; color: var(--muted); margin-top: 2px; display: flex; gap: 4px; flex-wrap: wrap; }
+  .tag {
+    display: inline-block; padding: 1px 4px; border-radius: 2px; font-size: .5rem;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+  }
+  .tag.hutang { border-color: var(--debt); color: var(--debt); }
+  .tag.pinjam { border-color: var(--loan); color: var(--loan); }
+  .tag.lunas  { border-color: var(--income); color: var(--income); }
+
+  .tx-right { text-align: right; }
+  .tx-amount { font-size: .7rem; font-weight: 700; white-space: nowrap; }
+  .tx-amount.income  { color: var(--income); }
+  .tx-amount.expense { color: var(--expense); }
+  .tx-amount.hutang  { color: var(--debt); }
+  .tx-amount.pinjam  { color: var(--loan); }
+  .tx-stars { font-size: .5rem; color: var(--muted); margin-top: 2px; }
+
+  .empty { text-align: center; padding: 40px 15px; color: var(--muted); font-size: .7rem; line-height: 1.6; }
+  .empty-icon { font-size: 2rem; margin-bottom: 8px; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar-section { border-bottom: 1px solid var(--border); }
+  .section-header {
+    padding: 8px 12px; font-size: .55rem;
+    text-transform: uppercase; letter-spacing: .12em; color: var(--muted);
+    background: var(--surface); display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0;
+  }
+
+  /* Form */
+  .form-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .field label {
+    display: block; font-size: .55rem; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--muted); margin-bottom: 3px;
+  }
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+    color: var(--text); font-family: var(--mono); font-size: .7rem; padding: 6px 8px;
+    outline: none; transition: border-color .15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  select option { background: var(--surface); }
+  textarea { resize: vertical; min-height: 45px; }
+
+  .type-toggle {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .type-btn {
+    padding: 6px 8px; border: none; cursor: pointer;
+    font-family: var(--mono); font-size: .65rem; font-weight: 700;
+    background: var(--bg); color: var(--muted); transition: all .15s;
+    -webkit-user-select: none; user-select: none;
+  }
+  .type-btn.on-income  { background: var(--income); color: #000; }
+  .type-btn.on-expense { background: var(--expense); color: #fff; }
+  .type-btn.on-hutang  { background: var(--debt); color: #000; }
+  .type-btn.on-pinjam  { background: var(--loan); color: #fff; }
+
+  .hutang-fields {
+    background: rgba(255,159,67,.08); border: 1px solid var(--debt); border-radius: 3px;
+    padding: 8px; margin-top: 4px;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  .btn-primary {
+    width: 100%; padding: 8px 10px; border: none; border-radius: 3px;
+    font-family: var(--mono); font-size: .7rem; font-weight: 700;
+    background: var(--accent); color: #000; cursor: pointer;
+    transition: all .15s; letter-spacing: .04em; -webkit-user-select: none;
+  }
+  .btn-primary:active { opacity: .8; }
+
+  /* ── DEBT SIDEBAR ── */
+  .debt-section { padding: 0; }
+  .debt-badge { display: inline-block; background: var(--expense); color: #fff;
+    font-size: .5rem; font-weight: 700; padding: 2px 5px; border-radius: 10px;
+    margin-left: 6px;
+  }
+  .debt-list { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+  .debt-item {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 6px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 3px; transition: all .15s; gap: 6px;
+  }
+  .debt-item.lunas { opacity: .5; }
+  .debt-name { font-size: .65rem; font-weight: 600; line-height: 1.2; }
+  .debt-sub { font-size: .5rem; color: var(--muted); margin-top: 1px; }
+  .debt-right { text-align: right; flex-shrink: 0; }
+  .debt-amt { font-size: .65rem; font-weight: 700; color: var(--debt); }
+  .debt-bunga { font-size: .5rem; color: var(--muted); margin-top: 1px; }
+  .btn-lunas {
+    margin-top: 3px; padding: 3px 6px; font-size: .5rem; font-weight: 700;
+    background: var(--income); color: #000; border: none; border-radius: 2px;
+    cursor: pointer; transition: all .1s; -webkit-user-select: none; user-select: none;
+  }
+  .btn-lunas:active { opacity: .8; }
+
+  /* ── CATEGORY BREAKDOWN ── */
+  .cat-list { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; }
+  .cat-row {
+    display: grid; grid-template-columns: 50px 1fr 40px; gap: 6px; align-items: center;
+    font-size: .6rem;
+  }
+  .cat-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+  .cat-track { background: var(--surface); border-radius: 2px; height: 4px; overflow: hidden; }
+  .cat-fill { background: linear-gradient(90deg,var(--accent),var(--income)); height: 100%; }
+  .cat-val { text-align: right; font-weight: 700; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75);
+    z-index: 200; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    max-width: 400px; width: 90%; max-height: 85vh; display: flex; flex-direction: column;
+    animation: modalIn .2s ease;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+  .modal-head {
+    padding: 14px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: start;
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: .85rem; font-weight: 700; font-family: var(--display); }
+  .modal-close {
+    background: none; border: none; color: var(--muted); font-size: 1.2rem;
+    cursor: pointer; transition: color .15s; padding: 4px; -webkit-user-select: none;
+  }
+  .modal-close:active { color: var(--text); }
+  .modal-body { padding: 14px; overflow-y: auto; flex: 1; }
+  .modal-row { display: grid; grid-template-columns: 80px 1fr; gap: 12px; margin-bottom: 12px; font-size: .7rem; }
+  .modal-label { color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .modal-value { color: var(--text); font-weight: 600; word-break: break-word; }
+  .modal-foot {
+    padding: 10px 14px; border-top: 1px solid var(--border);
+    display: flex; gap: 6px;
+    flex-shrink: 0;
+  }
+  .btn-del {
+    flex: 1; padding: 7px 10px; border: 1px solid var(--expense); background: transparent;
+    color: var(--expense); border-radius: 3px; font-family: var(--mono); font-size: .65rem;
+    font-weight: 700; cursor: pointer; transition: all .15s; -webkit-user-select: none;
+  }
+  .btn-del:active { background: var(--expense); color: #fff; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 10px 14px; font-size: .7rem; z-index: 999;
+    transition: transform .25s ease; pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── FILE INPUT HIDDEN ── */
+  #import-file { display: none; }
+
+  /* ── EXPORT BUTTONS ── */
+  .export-section { 
+    padding: 10px 12px; 
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .btn-export {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text); border-radius: 3px; font-family: var(--mono); font-size: .7rem;
+    font-weight: 700; cursor: pointer; -webkit-user-select: none; user-select: none;
+    transition: all .15s;
+  }
+  .btn-export:active { opacity: .6; }
+  .btn-export.danger { border-color: var(--expense); color: var(--expense); }
+
+  /* ── PRIORITY STARS ── */
+  #priority-stars span {
+    color: var(--muted);
+    transition: all .15s;
+  }
+
+  #priority-stars span:hover,
+  #priority-stars span.active {
+    color: var(--accent);
+  }
+</style>
 </head>
-
 <body>
 
-  <!-- ── Import / Start Screen ── -->
-  <div id="import-overlay">
-    <div class="import-box">
-      <div class="import-title">Survival<em>Bot</em> 💸</div>
-      <div class="import-sub">Import <code>db.json</code> yang sudah ada, atau mulai sesi baru dari awal.</div>
+<header>
+  <div class="logo">survival<em>bot</em></div>
+  <div class="header-meta">
+    <span id="header-name">Anonim</span>
+    <span id="header-balance">Rp 0</span>
+  </div>
+</header>
 
-      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-        <div class="dz-icon">📂</div>
-        <div>Klik atau drag &amp; drop <strong>db.json</strong> di sini</div>
+<div class="summary-strip">
+  <div class="stat-card">
+    <div class="stat-label">Saldo</div>
+    <div id="stat-balance" class="stat-value yellow">Rp 0</div>
+    <div id="stat-balance-sub" class="stat-sub">Net: +Rp 0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Masuk</div>
+    <div id="stat-income" class="stat-value green">Rp 0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Keluar</div>
+    <div id="stat-expense" class="stat-value red">Rp 0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Hutang</div>
+    <div id="stat-debt" class="stat-value orange">Rp 0</div>
+    <div id="stat-debt-sub" class="stat-sub">0 belum lunas</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="tx-panel">
+    <div class="tx-toolbar">
+      <div class="filter-pills">
+        <button class="pill active pill-all" onclick="setFilter('all')">ALL</button>
+        <button class="pill pill-income" onclick="setFilter('income')">IN</button>
+        <button class="pill pill-expense" onclick="setFilter('expense')">OUT</button>
+        <button class="pill pill-hutang" onclick="setFilter('hutang')">UTANG</button>
       </div>
-      <input type="file" id="file-input" accept=".json" style="display:none" onchange="handleFileImport(this)">
-
-      <div class="import-or">— atau mulai baru —</div>
-
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="field"><label>Nama</label>
-          <input type="text" id="fresh-name" placeholder="contoh: Arya Danuwarta">
-        </div>
-        <div class="form-row">
-          <div class="field"><label>Pendapatan Bulanan (IDR)</label>
-            <input type="number" id="fresh-income" placeholder="1400000">
-          </div>
-          <div class="field"><label>Saldo Awal (IDR)</label>
-            <input type="number" id="fresh-balance" placeholder="0">
-          </div>
-        </div>
-      </div>
-      <button class="btn-add" onclick="startFresh()">Mulai Sesi Baru 🚀</button>
+      <div class="tx-count" id="tx-count">0</div>
+    </div>
+    <div class="tx-list" id="tx-list">
+      <div class="empty"><div class="empty-icon">🍜</div>Belum ada transaksi</div>
     </div>
   </div>
 
-  <!-- ── Header ── -->
-  <header>
-    <div class="logo">Survival<em>Bot</em> 💸</div>
-    <div class="header-meta">
-      Halo, <strong id="header-name">—</strong>
-    </div>
-  </header>
-
-  <!-- ── Summary ── -->
-  <div class="summary-strip">
-    <div class="stat-card">
-      <div class="stat-label">Saldo Sekarang</div>
-      <div class="stat-value yellow" id="stat-balance">Rp 0</div>
-      <div class="stat-sub" id="stat-balance-sub">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Pemasukan Bulan Ini</div>
-      <div class="stat-value green" id="stat-income">Rp 0</div>
-      <div class="stat-sub">Total masuk</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Pengeluaran Bulan Ini</div>
-      <div class="stat-value red" id="stat-expense">Rp 0</div>
-      <div class="stat-sub">Total keluar</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Hutang Pending</div>
-      <div class="stat-value orange" id="stat-debt">Rp 0</div>
-      <div class="stat-sub" id="stat-debt-sub">Belum lunas</div>
-    </div>
-  </div>
-
-  <!-- ── Layout ── -->
-  <div class="layout">
-
-    <!-- Left: TX List -->
-    <div class="tx-panel">
-      <div class="tx-toolbar">
-        <div class="filter-pills">
-          <button class="pill active" onclick="setFilter('all',this)">Semua</button>
-          <button class="pill pill-income" onclick="setFilter('income',this)">Pemasukan</button>
-          <button class="pill pill-expense" onclick="setFilter('expense',this)">Pengeluaran</button>
-          <button class="pill pill-hutang" onclick="setFilter('hutang',this)">Hutang</button>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-section" id="sidebar-form">
+      <div class="section-header">CATAT</div>
+      <div class="form-body">
+        <div class="field">
+          <label>NAMA</label>
+          <input type="text" id="form-item" placeholder="Sebut apa...">
         </div>
-        <div class="tx-count" id="tx-count">0 transaksi</div>
-      </div>
-      <div class="tx-list" id="tx-list"></div>
-    </div>
-
-    <!-- Right: Sidebar -->
-    <div class="sidebar">
-
-      <!-- Form tambah transaksi -->
-      <div class="sidebar-section">
-        <div class="section-header">Tambah Transaksi</div>
-        <div class="form-body">
-          <div class="field">
-            <div class="type-toggle">
-              <button class="type-btn on-income" id="btn-income" onclick="setType('income')">+ Masuk</button>
-              <button class="type-btn" id="btn-expense" onclick="setType('expense')">− Keluar</button>
-            </div>
+        <div class="field">
+          <label>JUMLAH</label>
+          <input type="text" id="form-amount" placeholder="0" min="0" oninput="formatAmount(this)">
+        </div>
+        <div class="field">
+          <label>TANGGAL</label>
+          <input type="date" id="form-date">
+        </div>
+        <div class="field">
+          <label>KATEGORI</label>
+          <select id="form-category">
+            <option>Makanan</option>
+            <option>Transport</option>
+            <option>Hiburan</option>
+            <option>Belanja</option>
+            <option>Utilitas</option>
+            <option>Lain</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>TIPE</label>
+          <div class="type-toggle">
+            <button class="type-btn on-income" onclick="setType('income')">MASUK</button>
+            <button class="type-btn" onclick="setType('expense')">KELUAR</button>
           </div>
+        </div>
+        <div id="hutang-toggle" style="display:none; margin-top:6px; gap:6px; display:flex;">
+          <button class="type-btn" style="flex:1;padding:8px" onclick="setType('hutang')">📤 HUTANG</button>
+          <button class="type-btn" style="flex:1;padding:8px" onclick="setType('pinjam')">📥 PINJAM</button>
+        </div>
+        <div id="hutang-fields" class="hutang-fields" style="display:none;">
           <div class="field">
-            <label>Nama Transaksi</label>
-            <input type="text" id="f-item" placeholder="cth: Makan siang naspad">
+            <label>KE SIAPA?</label>
+            <input type="text" id="form-hutang-to" placeholder="Nama teman/bank">
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Kategori</label>
-              <select id="f-cat">
-                <option>Makan</option>
-                <option>Transportasi</option>
-                <option>Kosan</option>
-                <option>Belanja</option>
-                <option>Modal</option>
-                <option>Pemasukan</option>
-                <option>Hutang</option>
-                <option>Lain-lain</option>
-              </select>
+              <label>JATUH TEMPO</label>
+              <input type="date" id="form-hutang-due">
             </div>
             <div class="field">
-              <label>Jumlah (IDR)</label>
-              <input type="number" id="f-amount" placeholder="15000">
+              <label>BUNGA (%) OPS</label>
+              <input type="number" id="form-hutang-bunga" placeholder="0" min="0" step="0.1">
             </div>
+          </div>
+        </div>
+        <div id="pinjam-fields" class="hutang-fields" style="display:none;">
+          <div class="field">
+            <label>DARI SIAPA?</label>
+            <input type="text" id="form-pinjam-from" placeholder="Nama teman/bank">
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Tanggal</label>
-              <input type="date" id="f-date">
+              <label>JATUH TEMPO</label>
+              <input type="date" id="form-pinjam-due">
             </div>
             <div class="field">
-              <label>Prioritas</label>
-              <select id="f-priority">
-                <option value="5">★★★★★ Krusial</option>
-                <option value="4">★★★★ Penting</option>
-                <option value="3" selected>★★★ Lumayan</option>
-                <option value="2">★★ Hiburan</option>
-                <option value="1">★ Receh</option>
-              </select>
+              <label>BUNGA (%) OPS</label>
+              <input type="number" id="form-pinjam-bunga" placeholder="0" min="0" step="0.1">
             </div>
           </div>
-          <div class="field">
-            <label>Keterangan</label>
-            <textarea id="f-desc" placeholder="Cerita dikit..."></textarea>
+        </div>
+        <div class="field">
+          <label>PRIORITAS</label>
+          <div id="priority-stars" style="display:flex; gap:4px; font-size:1.2rem; cursor:pointer;">
+            <span data-val="1">★</span>
+            <span data-val="2">★</span>
+            <span data-val="3">★</span>
+            <span data-val="4">★</span>
+            <span data-val="5">★</span>
           </div>
-
-          <!-- Hutang section — muncul saat tipe expense -->
-          <div id="hutang-fields" class="hutang-fields" style="display:none">
-            <label style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--debt)">Opsi
-              Hutang</label>
-            <label class="checkbox-row">
-              <input type="checkbox" id="f-is-hutang" onchange="toggleHutangDetail()">
-              Ini hutang / belum lunas
-            </label>
-            <div id="hutang-detail" style="display:none;flex-direction:column;gap:8px">
-              <div class="field">
-                <label>Hutang kepada</label>
-                <input type="text" id="f-hutang-to" placeholder="cth: Ibu Kos">
-              </div>
-              <div class="field">
-                <label>Jatuh tempo</label>
-                <input type="date" id="f-hutang-due">
-              </div>
-            </div>
-          </div>
-
-          <button class="btn-add" onclick="addTransaction()">Catat ✓</button>
+          <input type="hidden" id="form-priority" value="3">
         </div>
-      </div>
-
-      <!-- Daftar hutang -->
-      <div class="sidebar-section">
-        <div class="section-header">
-          Daftar Hutang
-          <span id="debt-badge" style="color:var(--debt);font-weight:700">0</span>
+        <div class="field">
+          <label>CATATAN</label>
+          <textarea id="form-desc" placeholder="..."></textarea>
         </div>
-        <div class="debt-list" id="debt-list"></div>
-      </div>
-
-      <!-- Kategori breakdown -->
-      <div class="sidebar-section">
-        <div class="section-header">Pengeluaran per Kategori</div>
-        <div class="cat-list" id="cat-list"></div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ── Modal Detail TX ── -->
-  <div class="overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
-    <div class="modal">
-      <div class="modal-title" id="modal-title">—</div>
-      <div class="modal-grid">
-        <div class="modal-field"><label>Tanggal</label>
-          <p id="modal-date">—</p>
-        </div>
-        <div class="modal-field"><label>Kategori</label>
-          <p id="modal-cat">—</p>
-        </div>
-        <div class="modal-field"><label>Jumlah</label>
-          <p id="modal-amount">—</p>
-        </div>
-        <div class="modal-field"><label>Prioritas</label>
-          <p id="modal-priority">—</p>
-        </div>
-        <div class="modal-field" id="modal-hutang-row" style="display:none"><label>Hutang ke</label>
-          <p id="modal-hutang-to">—</p>
-        </div>
-        <div class="modal-field" id="modal-due-row" style="display:none"><label>Jatuh tempo</label>
-          <p id="modal-due">—</p>
-        </div>
-      </div>
-      <div class="modal-desc">
-        <label>Keterangan</label>
-        <p id="modal-desc">—</p>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-modal-close" onclick="closeModal()">Tutup</button>
-        <button class="btn-modal-delete" onclick="deleteTransaction()">Hapus</button>
+        <button class="btn-primary" onclick="addTransaction()">CATAT</button>
       </div>
     </div>
+
+    <div class="sidebar-section debt-section">
+      <div class="section-header">HUTANG/PINJAM <span class="debt-badge" id="debt-badge">0</span></div>
+      <div class="debt-list" id="debt-list">
+        <div style="font-size:.6rem;color:var(--muted);padding:4px 0">Kosong</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-header">KATEGORI</div>
+      <div class="cat-list" id="cat-list">
+        <div style="font-size:.6rem;color:var(--muted);padding:4px 0">Kosong</div>
+      </div>
+    </div>
+
+    <div class="export-section" id="export-menu">
+      <button class="btn-export" onclick="exportDB()">💾 EXPORT</button>
+      <button class="btn-export" onclick="document.getElementById('import-file').click()">📂 IMPORT</button>
+      <button class="btn-export danger" onclick="resetAll()">🗑️ RESET</button>
+      <input type="file" id="import-file" accept=".json" onchange="importDB(event)">
+    </div>
   </div>
+</div>
 
-  <div class="header-actions">
-    <button class="btn-sm" onclick="exportJSON()">⬇ Export db.json</button>
-    <button class="btn-sm" onclick="triggerImport()">⬆ Import db.json</button>
-    <button class="btn-sm danger" onclick="resetAll()">Reset</button>
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Transaksi</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-label">Tanggal</div>
+        <div class="modal-value" id="modal-date">—</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Jumlah</div>
+        <div class="modal-value" id="modal-amount">Rp 0</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Kategori</div>
+        <div class="modal-value" id="modal-cat">—</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Prioritas</div>
+        <div class="modal-value" id="modal-priority">—</div>
+      </div>
+      <div id="modal-hutang-row" class="modal-row" style="display:none;">
+        <div class="modal-label">Hutang Ke</div>
+        <div class="modal-value" id="modal-hutang-to">—</div>
+      </div>
+      <div id="modal-pinjam-row" class="modal-row" style="display:none;">
+        <div class="modal-label">Pinjam Dari</div>
+        <div class="modal-value" id="modal-pinjam-from">—</div>
+      </div>
+      <div id="modal-bunga-row" class="modal-row" style="display:none;">
+        <div class="modal-label">Bunga</div>
+        <div class="modal-value" id="modal-bunga">0%</div>
+      </div>
+      <div id="modal-due-row" class="modal-row" style="display:none;">
+        <div class="modal-label">Jatuh Tempo</div>
+        <div class="modal-value" id="modal-due">—</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Catatan</div>
+        <div class="modal-value" id="modal-desc">—</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-del" onclick="deleteTransaction()">HAPUS</button>
+    </div>
   </div>
+</div>
 
-  <!-- Hidden reimport input -->
-  <input type="file" id="reimport-input" accept=".json" style="display:none" onchange="handleFileImport(this)">
+<div id="toast"></div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+<script>
+/* STATE */
+const db = {
+  user: 'Anonim',
+  current_balance: 0,
+  pending_debt: 0,
+  transactions: [],
+};
 
-  <script>
-    /* ═══════════════════════════════
-       STATE
-    ═══════════════════════════════ */
-    let db = {
-      user: "",
-      currency: "IDR",
-      monthly_income: 0,
-      current_balance: 0,
-      pending_debt: 0,
-      transactions: []
+let activeFilter = 'all';
+let selectedIdx = null;
+let formType = 'income';
+const STARS = { 5:'★★★★★', 4:'★★★★', 3:'★★★', 2:'★★', 1:'★' };
+
+function save() {
+  localStorage.setItem('survivalbot', JSON.stringify(db));
+}
+
+function load() {
+  const data = localStorage.getItem('survivalbot');
+  if (data) Object.assign(db, JSON.parse(data));
+}
+
+function boot() {
+  load();
+  document.getElementById('form-date').valueAsDate = new Date();
+  
+  // Setup priority stars
+  document.querySelectorAll('#priority-stars span').forEach(star => {
+    star.addEventListener('click', (e) => {
+      const val = e.target.dataset.val;
+      document.getElementById('form-priority').value = val;
+      updateStarDisplay();
+    });
+  });
+  updateStarDisplay();
+  render();
+}
+
+function updateStarDisplay() {
+  const val = parseInt(document.getElementById('form-priority').value);
+  document.querySelectorAll('#priority-stars span').forEach((star, idx) => {
+    if (idx + 1 <= val) star.classList.add('active');
+    else star.classList.remove('active');
+  });
+}
+
+function formatAmount(el) {
+  let val = el.value.replace(/\D/g, '');
+  if (val) {
+    val = val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  el.value = val;
+}
+
+function toggleMenu() {
+  const menu = document.getElementById('export-menu');
+  const isHidden = menu.style.display === 'none' || window.getComputedStyle(menu).display === 'none';
+  menu.style.display = isHidden ? 'flex' : 'none';
+}
+
+function setType(t) {
+  formType = t;
+  document.querySelectorAll('.type-btn').forEach(b => b.className = 'type-btn');
+  
+  const buttons = document.querySelectorAll('.type-toggle .type-btn');
+  if (t === 'income') buttons[0].className = 'type-btn on-income';
+  if (t === 'expense') buttons[1].className = 'type-btn on-expense';
+  
+  const toggle = document.getElementById('hutang-toggle');
+  document.getElementById('hutang-fields').style.display = 'none';
+  document.getElementById('pinjam-fields').style.display = 'none';
+  
+  if (t === 'expense') toggle.style.display = 'flex';
+  else toggle.style.display = 'none';
+  
+  if (t === 'hutang') {
+    document.getElementById('hutang-toggle').querySelectorAll('.type-btn')[0].className = 'type-btn on-hutang';
+    document.getElementById('hutang-fields').style.display = '';
+  }
+  if (t === 'pinjam') {
+    document.getElementById('hutang-toggle').querySelectorAll('.type-btn')[1].className = 'type-btn on-pinjam';
+    document.getElementById('pinjam-fields').style.display = '';
+  }
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  if (f === 'all') document.querySelector('.pill-all').classList.add('active');
+  if (f === 'income') document.querySelector('.pill-income').classList.add('active');
+  if (f === 'expense') document.querySelector('.pill-expense').classList.add('active');
+  if (f === 'hutang') document.querySelector('.pill-hutang').classList.add('active');
+  renderTxList();
+}
+
+function addTransaction() {
+  const item = document.getElementById('form-item').value.trim();
+  const amount = parseFloat(document.getElementById('form-amount').value.replace(/\./g, ''));
+  const date = document.getElementById('form-date').value;
+  const category = document.getElementById('form-category').value;
+  const priority = parseInt(document.getElementById('form-priority').value) || 3;
+  const desc = document.getElementById('form-desc').value.trim();
+
+  if (!item || !amount || !date) {
+    toast('Isi semua field!');
+    return;
+  }
+
+  if (formType === 'hutang') {
+    const bunga = parseFloat(document.getElementById('form-hutang-bunga').value) || 0;
+    const tx = {
+      item, amount, date, category, type: 'hutang', is_hutang: true,
+      description: desc, importance_rating: priority,
+      hutang_to: document.getElementById('form-hutang-to').value.trim() || 'Entah',
+      hutang_due: document.getElementById('form-hutang-due').value || '',
+      hutang_bunga: bunga,
+      hutang_lunas: false,
     };
+    db.transactions.push(tx);
+    db.pending_debt += amount;
+    toast(`Hutang dicatat (${bunga}% bunga)`);
+  } else if (formType === 'pinjam') {
+    const bunga = parseFloat(document.getElementById('form-pinjam-bunga').value) || 0;
+    const tx = {
+      item, amount, date, category, type: 'pinjam', is_pinjam: true,
+      description: desc, importance_rating: priority,
+      pinjam_from: document.getElementById('form-pinjam-from').value.trim() || 'Entah',
+      pinjam_due: document.getElementById('form-pinjam-due').value || '',
+      pinjam_bunga: bunga,
+      pinjam_lunas: false,
+    };
+    db.transactions.push(tx);
+    db.current_balance += amount;
+    toast(`Pinjam +Rp ${fmt(amount)}`);
+  } else {
+    const tx = {
+      item, amount, date, category, type: formType,
+      description: desc, importance_rating: priority,
+      is_hutang: false, is_pinjam: false,
+    };
+    db.transactions.push(tx);
+    if (formType === 'income') db.current_balance += amount;
+    else db.current_balance -= amount;
+    toast(formType === 'income' ? 'Masuk' : 'Keluar');
+  }
 
-    let activeFilter = 'all';
-    let selectedIdx = null;
+  document.getElementById('form-item').value = '';
+  document.getElementById('form-amount').value = '';
+  document.getElementById('form-hutang-to').value = '';
+  document.getElementById('form-hutang-due').value = '';
+  document.getElementById('form-hutang-bunga').value = '';
+  document.getElementById('form-pinjam-from').value = '';
+  document.getElementById('form-pinjam-due').value = '';
+  document.getElementById('form-pinjam-bunga').value = '';
+  document.getElementById('form-desc').value = '';
 
-    /* ═══════════════════════════════
-       BOOT
-    ═══════════════════════════════ */
-    function boot() {
-      const raw = localStorage.getItem('survivalbot');
-      if (raw) {
-        db = JSON.parse(raw);
-        hideImportScreen();
-        render();
-      }
+  save();
+  render();
+}
 
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('f-date').value = today;
-      document.getElementById('f-hutang-due').value = today;
+function bayarHutang(idx) {
+  const t = db.transactions[idx];
+  if (!t || !t.is_hutang) return;
+  db.current_balance -= t.amount;
+  db.pending_debt = Math.max(0, db.pending_debt - t.amount);
+  t.hutang_lunas = true;
+  save();
+  render();
+  toast('Hutang lunas −Rp ' + fmt(t.amount));
+}
 
-      // Drag & drop on drop zone
-      const dz = document.getElementById('drop-zone');
-      dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
-      dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
-      dz.addEventListener('drop', e => {
-        e.preventDefault(); dz.classList.remove('drag');
-        if (e.dataTransfer.files[0]) readJSONFile(e.dataTransfer.files[0]);
-      });
-    }
+function bayarPinjam(idx) {
+  const t = db.transactions[idx];
+  if (!t || !t.is_pinjam) return;
+  db.current_balance -= t.amount;
+  t.pinjam_lunas = true;
+  save();
+  render();
+  toast('Pinjam lunas −Rp ' + fmt(t.amount));
+}
 
-    function hideImportScreen() {
-      document.getElementById('import-overlay').style.display = 'none';
-    }
+function exportDB() {
+  const data = JSON.stringify(db, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'survivalbot-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Exported ✓');
+}
 
-    /* ═══════════════════════════════
-       IMPORT / EXPORT
-    ═══════════════════════════════ */
-    function handleFileImport(input) {
-      if (input.files[0]) readJSONFile(input.files[0]);
-      input.value = '';
-    }
-
-    function readJSONFile(file) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (!parsed.user || !Array.isArray(parsed.transactions)) {
-            alert('Format db.json tidak valid!'); return;
-          }
-          // Inject field baru kalau belum ada (backward compat)
-          if (parsed.pending_debt === undefined) parsed.pending_debt = 0;
-          db = parsed;
-          save();
-          hideImportScreen();
-          render();
-          toast('db.json diimport ✓');
-        } catch {
-          alert('File tidak valid!');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    /**
-     * Export db.json — struktur PERSIS sama dengan format GitHub:
-     * root: user, currency, monthly_income, current_balance, pending_debt, transactions[]
-     * tiap transaksi: date, item, category, amount, type, importance_rating, description
-     * + field tambahan kalau ada (is_hutang, hutang_to, hutang_due, hutang_lunas)
-     */
-    function exportJSON() {
-      const out = JSON.stringify(db, null, 2);
-      const a = Object.assign(document.createElement('a'), {
-        href: URL.createObjectURL(new Blob([out], { type: 'application/json' })),
-        download: 'db.json'
-      });
-      a.click();
-      toast('db.json diunduh ✓');
-    }
-
-    function triggerImport() {
-      document.getElementById('reimport-input').click();
-    }
-
-    /* ═══════════════════════════════
-       START FRESH
-    ═══════════════════════════════ */
-    function startFresh() {
-      const name = document.getElementById('fresh-name').value.trim();
-      if (!name) { alert('Masukkan nama dulu!'); return; }
-      db = {
-        user: name,
-        currency: "IDR",
-        monthly_income: parseInt(document.getElementById('fresh-income').value) || 0,
-        current_balance: parseInt(document.getElementById('fresh-balance').value) || 0,
-        pending_debt: 0,
-        transactions: []
-      };
-      save();
-      hideImportScreen();
-      render();
-    }
-
-    /* ═══════════════════════════════
-       SAVE
-    ═══════════════════════════════ */
-    function save() {
-      localStorage.setItem('survivalbot', JSON.stringify(db));
-    }
-
-    /* ═══════════════════════════════
-       TYPE TOGGLE
-    ═══════════════════════════════ */
-    let currentType = 'income';
-    function setType(type) {
-      currentType = type;
-      document.getElementById('btn-income').className = 'type-btn' + (type === 'income' ? ' on-income' : '');
-      document.getElementById('btn-expense').className = 'type-btn' + (type === 'expense' ? ' on-expense' : '');
-      document.getElementById('hutang-fields').style.display = type === 'expense' ? 'flex' : 'none';
-      if (type !== 'expense') {
-        document.getElementById('f-is-hutang').checked = false;
-        document.getElementById('hutang-detail').style.display = 'none';
-      }
-    }
-
-    function toggleHutangDetail() {
-      const on = document.getElementById('f-is-hutang').checked;
-      document.getElementById('hutang-detail').style.display = on ? 'flex' : 'none';
-    }
-
-    /* ═══════════════════════════════
-       ADD TRANSACTION
-    ═══════════════════════════════ */
-    function addTransaction() {
-      const item = document.getElementById('f-item').value.trim();
-      const cat = document.getElementById('f-cat').value;
-      const amount = parseInt(document.getElementById('f-amount').value);
-      const date = document.getElementById('f-date').value;
-      const priority = parseInt(document.getElementById('f-priority').value);
-      const desc = document.getElementById('f-desc').value.trim();
-      const isHutang = document.getElementById('f-is-hutang').checked && currentType === 'expense';
-      const hutangTo = document.getElementById('f-hutang-to').value.trim();
-      const hutangDue = document.getElementById('f-hutang-due').value;
-
-      if (!item) { alert('Nama transaksi kosong!'); return; }
-      if (!amount || amount <= 0) { alert('Jumlah harus > 0!'); return; }
-      if (!date) { alert('Tanggal harus diisi!'); return; }
-
-      /* Struktur transaksi — field wajib sesuai db.json GitHub */
-      const tx = {
-        date,
-        item,
-        category: cat,
-        amount,
-        type: currentType,
-        importance_rating: priority,
-        description: desc
-      };
-
-      /* Field ekstra hutang */
-      if (isHutang) {
-        tx.is_hutang = true;
-        tx.hutang_to = hutangTo || 'Tidak dicatat';
-        tx.hutang_due = hutangDue || null;
-        tx.hutang_lunas = false;
-        db.pending_debt += amount;
-      }
-
-      /* Update saldo root */
-      if (currentType === 'income') db.current_balance += amount;
-      else db.current_balance -= amount;
-
-      db.transactions.unshift(tx);
+function importDB(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      Object.assign(db, imported);
       save();
       render();
-
-      /* Reset form */
-      ['f-item', 'f-amount', 'f-desc', 'f-hutang-to'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('f-is-hutang').checked = false;
-      document.getElementById('hutang-detail').style.display = 'none';
-      toast('Transaksi dicatat ✓');
+      toast('Imported ✓');
+      document.getElementById('import-file').value = '';
+    } catch (err) {
+      toast('Error import!');
+      console.error(err);
     }
+  };
+  reader.readAsText(file);
+}
 
-    /* ═══════════════════════════════
-       LUNAS
-    ═══════════════════════════════ */
-    function bayarHutang(globalIdx) {
-      const t = db.transactions[globalIdx];
-      if (!t || !t.is_hutang || t.hutang_lunas) return;
-      if (!confirm(`Tandai "${t.item}" sebagai lunas?`)) return;
-      db.transactions[globalIdx].hutang_lunas = true;
-      db.pending_debt = Math.max(0, db.pending_debt - t.amount);
-      save();
-      render();
-      toast('Hutang ditandai lunas ✓');
-    }
+function resetAll() {
+  if (!confirm('Reset semua data?')) return;
+  localStorage.removeItem('survivalbot');
+  location.reload();
+}
 
-    /* ═══════════════════════════════
-       FILTER
-    ═══════════════════════════════ */
-    function setFilter(f, el) {
-      activeFilter = f;
-      document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-      el.classList.add('active');
-      renderTxList();
-    }
+const fmt = n => 'Rp ' + Math.abs(n).toLocaleString('id-ID');
 
-    /* ═══════════════════════════════
-       RENDER
-    ═══════════════════════════════ */
-    const fmt = n => 'Rp ' + Math.abs(n).toLocaleString('id-ID');
+function render() {
+  document.getElementById('header-name').textContent = db.user;
+  const bal = db.current_balance;
+  const balEl = document.getElementById('stat-balance');
+  balEl.textContent = (bal < 0 ? '−' : '') + fmt(bal);
+  balEl.className = 'stat-value ' + (bal < 0 ? 'red' : 'yellow');
+  document.getElementById('header-balance').textContent = (bal < 0 ? '−' : '') + fmt(bal);
 
-    function render() {
-      document.getElementById('header-name').textContent = db.user;
+  const ym = new Date().toISOString().slice(0,7);
+  const mo = db.transactions.filter(t => t.date.startsWith(ym) && !t.is_hutang && !t.is_pinjam);
+  const totalIn = mo.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
+  const totalOut = mo.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
 
-      const bal = db.current_balance;
-      const balEl = document.getElementById('stat-balance');
-      balEl.textContent = (bal < 0 ? '−' : '') + fmt(bal);
-      balEl.className = 'stat-value ' + (bal < 0 ? 'red' : 'yellow');
-      const hb = document.getElementById('header-balance');
-      hb.textContent = (bal < 0 ? '−' : '') + fmt(bal);
-      hb.style.color = bal < 0 ? 'var(--expense)' : 'var(--accent)';
+  document.getElementById('stat-income').textContent = fmt(totalIn);
+  document.getElementById('stat-expense').textContent = fmt(totalOut);
+  document.getElementById('stat-debt').textContent = fmt(db.pending_debt);
 
-      const ym = new Date().toISOString().slice(0, 7);
-      const mo = db.transactions.filter(t => t.date.startsWith(ym));
-      const totalIn = mo.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-      const totalOut = mo.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const net = totalIn - totalOut;
+  document.getElementById('stat-balance-sub').textContent = (net >= 0 ? '+' : '−') + fmt(net);
 
-      document.getElementById('stat-income').textContent = fmt(totalIn);
-      document.getElementById('stat-expense').textContent = fmt(totalOut);
-      document.getElementById('stat-debt').textContent = fmt(db.pending_debt);
+  const pendingCount = db.transactions.filter(t => t.is_hutang && !t.hutang_lunas).length +
+                        db.transactions.filter(t => t.is_pinjam && !t.pinjam_lunas).length;
+  document.getElementById('stat-debt-sub').textContent = pendingCount + ' belum lunas';
 
-      const net = totalIn - totalOut;
-      document.getElementById('stat-balance-sub').textContent =
-        'Net bulan ini: ' + (net >= 0 ? '+' : '−') + fmt(net);
+  renderTxList();
+  renderDebtList();
+  renderCatBreakdown();
+}
 
-      const pendingCount = db.transactions.filter(t => t.is_hutang && !t.hutang_lunas).length;
-      document.getElementById('stat-debt-sub').textContent = pendingCount + ' belum lunas';
+function renderTxList() {
+  const list = document.getElementById('tx-list');
+  let txs = db.transactions.map((t,i) => ({...t,_i:i}));
 
-      renderTxList();
-      renderDebtList();
-      renderCatBreakdown();
-    }
+  if (activeFilter === 'income') txs = txs.filter(t => t.type === 'income');
+  if (activeFilter === 'expense') txs = txs.filter(t => t.type === 'expense' && !t.is_hutang && !t.is_pinjam);
+  if (activeFilter === 'hutang') txs = txs.filter(t => t.is_hutang || t.is_pinjam);
 
-    const STARS = { 5: '★★★★★', 4: '★★★★', 3: '★★★', 2: '★★', 1: '★' };
+  document.getElementById('tx-count').textContent = txs.length;
 
-    function renderTxList() {
-      const list = document.getElementById('tx-list');
-      let txs = db.transactions.map((t, i) => ({ ...t, _i: i }));
+  if (!txs.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🍜</div>Kosong</div>`;
+    return;
+  }
 
-      if (activeFilter === 'income') txs = txs.filter(t => t.type === 'income');
-      if (activeFilter === 'expense') txs = txs.filter(t => t.type === 'expense' && !t.is_hutang);
-      if (activeFilter === 'hutang') txs = txs.filter(t => t.is_hutang);
-
-      document.getElementById('tx-count').textContent = txs.length + ' transaksi';
-
-      if (!txs.length) {
-        list.innerHTML = `<div class="empty"><div class="empty-icon">🍜</div>Belum ada transaksi di sini.<br>Catat yang pertama!</div>`;
-        return;
-      }
-
-      list.innerHTML = txs.map((t, i) => `
-    <div class="tx-item" style="animation-delay:${Math.min(i, 15) * .025}s" onclick="openModal(${t._i})">
-      <div class="tx-bar ${t.type}"></div>
+  list.innerHTML = txs.map((t,i) => `
+    <div class="tx-item" style="animation-delay:${Math.min(i,15)*.02}s" onclick="openModal(${t._i})">
+      <div class="tx-bar ${t.is_hutang ? 'hutang' : (t.is_pinjam ? 'pinjam' : t.type)}"></div>
       <div>
         <div class="tx-name">${esc(t.item)}</div>
         <div class="tx-meta">
           <span class="tag">${esc(t.category)}</span>
           <span>${t.date}</span>
-          ${t.is_hutang ? `<span class="tag ${t.hutang_lunas ? 'lunas' : 'hutang'}">${t.hutang_lunas ? 'lunas' : 'hutang'}</span>` : ''}
+          ${t.is_hutang ? `<span class="tag hutang">${t.hutang_lunas?'lunas':'hutang'}</span>` : ''}
+          ${t.is_pinjam ? `<span class="tag pinjam">${t.pinjam_lunas?'lunas':'pinjam'}</span>` : ''}
         </div>
       </div>
       <div class="tx-right">
-        <div class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '−'}${fmt(t.amount)}</div>
+        <div class="tx-amount ${t.is_hutang ? 'hutang' : (t.is_pinjam ? 'pinjam' : t.type)}">
+          ${t.is_pinjam ? '+' : (t.type === 'income' ? '+' : '−')}${fmt(t.amount)}
+        </div>
         <div class="tx-stars">${STARS[t.importance_rating] || ''}</div>
       </div>
     </div>
   `).join('');
-    }
+}
 
-    function renderDebtList() {
-      const list = document.getElementById('debt-list');
-      const badge = document.getElementById('debt-badge');
-      const debts = db.transactions.map((t, i) => ({ ...t, _i: i })).filter(t => t.is_hutang);
-      badge.textContent = debts.filter(d => !d.hutang_lunas).length;
+function renderDebtList() {
+  const list = document.getElementById('debt-list');
+  const badge = document.getElementById('debt-badge');
+  const debts = db.transactions.map((t,i) => ({...t,_i:i})).filter(t => t.is_hutang || t.is_pinjam);
+  badge.textContent = debts.filter(d => (d.is_hutang && !d.hutang_lunas) || (d.is_pinjam && !d.pinjam_lunas)).length;
 
-      if (!debts.length) {
-        list.innerHTML = `<div style="font-size:.65rem;color:var(--muted);padding:4px 0">Tidak ada hutang tercatat.</div>`;
-        return;
-      }
-      list.innerHTML = debts.map(t => `
-    <div class="debt-item ${t.hutang_lunas ? 'lunas' : ''}">
+  if (!debts.length) {
+    list.innerHTML = `<div style="font-size:.6rem;color:var(--muted);padding:4px 0">Kosong</div>`;
+    return;
+  }
+  
+  list.innerHTML = debts.map(t => {
+    const lunas = t.is_hutang ? t.hutang_lunas : t.pinjam_lunas;
+    const label = t.is_hutang ? '← ' + (t.hutang_to || '—') : '→ ' + (t.pinjam_from || '—');
+    const bunga = t.is_hutang ? t.hutang_bunga : t.pinjam_bunga;
+    const due = t.is_hutang ? t.hutang_due : t.pinjam_due;
+    return `
+    <div class="debt-item ${lunas ? 'lunas' : ''}">
       <div>
         <div class="debt-name">${esc(t.item)}</div>
-        <div class="debt-sub">→ ${esc(t.hutang_to || '—')}${t.hutang_due ? ' · due: ' + t.hutang_due : ''}</div>
+        <div class="debt-sub">${label}${due ? ' · ' + due : ''}</div>
+        ${bunga ? `<div class="debt-bunga">${bunga}% bunga</div>` : ''}
       </div>
       <div class="debt-right">
         <div class="debt-amt">${fmt(t.amount)}</div>
-        ${!t.hutang_lunas
-          ? `<button class="btn-lunas" onclick="event.stopPropagation();bayarHutang(${t._i})">Lunas</button>`
-          : `<div style="font-size:.55rem;color:var(--income);margin-top:4px">✓ Lunas</div>`}
+        ${!lunas ? `<button class="btn-lunas" onclick="event.stopPropagation();${t.is_hutang ? 'bayarHutang' : 'bayarPinjam'}(${t._i})">Lunas</button>` : `<div style="font-size:.5rem;color:var(--income);margin-top:3px">✓</div>`}
       </div>
     </div>
-  `).join('');
-    }
+    `;
+  }).join('');
+}
 
-    function renderCatBreakdown() {
-      const list = document.getElementById('cat-list');
-      const exps = db.transactions.filter(t => t.type === 'expense');
-      if (!exps.length) {
-        list.innerHTML = `<div style="font-size:.65rem;color:var(--muted);padding:4px 0">Belum ada pengeluaran.</div>`;
-        return;
-      }
-      const map = {};
-      exps.forEach(t => { map[t.category] = (map[t.category] || 0) + t.amount; });
-      const max = Math.max(...Object.values(map));
-      list.innerHTML = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([cat, val]) => `
+function renderCatBreakdown() {
+  const list = document.getElementById('cat-list');
+  const exps = db.transactions.filter(t => t.type === 'expense' && !t.is_hutang && !t.is_pinjam);
+  if (!exps.length) {
+    list.innerHTML = `<div style="font-size:.6rem;color:var(--muted);padding:4px 0">Kosong</div>`;
+    return;
+  }
+  const map = {};
+  exps.forEach(t => { map[t.category] = (map[t.category] || 0) + t.amount; });
+  const max = Math.max(...Object.values(map));
+  list.innerHTML = Object.entries(map).sort((a,b) => b[1] - a[1]).slice(0,6).map(([cat,val]) => `
     <div class="cat-row">
       <div class="cat-name">${esc(cat)}</div>
-      <div class="cat-track"><div class="cat-fill" style="width:${(val / max * 100).toFixed(1)}%"></div></div>
-      <div class="cat-val">Rp ${(val / 1000).toFixed(0)}k</div>
+      <div class="cat-track"><div class="cat-fill" style="width:${(val/max*100).toFixed(1)}%"></div></div>
+      <div class="cat-val">${(val/1000).toFixed(0)}k</div>
     </div>
   `).join('');
-    }
+}
 
-    /* ═══════════════════════════════
-       MODAL
-    ═══════════════════════════════ */
-    function openModal(idx) {
-      const t = db.transactions[idx];
-      if (!t) return;
-      selectedIdx = idx;
+function openModal(idx) {
+  const t = db.transactions[idx];
+  if (!t) return;
+  selectedIdx = idx;
 
-      const PLABEL = { 5: '★★★★★ Krusial', 4: '★★★★ Penting', 3: '★★★ Lumayan', 2: '★★ Hiburan', 1: '★ Receh' };
-      document.getElementById('modal-title').textContent = t.item;
-      document.getElementById('modal-date').textContent = t.date;
-      document.getElementById('modal-cat').textContent = t.category;
-      document.getElementById('modal-amount').textContent = (t.type === 'income' ? '+' : '−') + fmt(t.amount);
-      document.getElementById('modal-amount').style.color = t.type === 'income' ? 'var(--income)' : 'var(--expense)';
-      document.getElementById('modal-priority').textContent = PLABEL[t.importance_rating] || '—';
-      document.getElementById('modal-desc').textContent = t.description || '(tidak ada keterangan)';
+  const PLABEL = { 5:'★★★★★', 4:'★★★★', 3:'★★★', 2:'★★', 1:'★' };
+  document.getElementById('modal-title').textContent = t.item;
+  document.getElementById('modal-date').textContent = t.date;
+  document.getElementById('modal-cat').textContent = t.category;
+  document.getElementById('modal-amount').textContent = (t.is_pinjam ? '+' : (t.type === 'income' ? '+' : '−')) + fmt(t.amount);
+  document.getElementById('modal-priority').textContent = PLABEL[t.importance_rating] || '—';
+  document.getElementById('modal-desc').textContent = t.description || '—';
 
-      document.getElementById('modal-hutang-row').style.display = t.is_hutang ? '' : 'none';
-      document.getElementById('modal-due-row').style.display = t.is_hutang ? '' : 'none';
-      if (t.is_hutang) {
-        document.getElementById('modal-hutang-to').textContent = t.hutang_to || '—';
-        document.getElementById('modal-due').textContent = t.hutang_due || '—';
-      }
+  document.getElementById('modal-hutang-row').style.display = t.is_hutang ? '' : 'none';
+  document.getElementById('modal-pinjam-row').style.display = t.is_pinjam ? '' : 'none';
+  document.getElementById('modal-due-row').style.display = (t.is_hutang || t.is_pinjam) ? '' : 'none';
+  document.getElementById('modal-bunga-row').style.display = ((t.is_hutang && t.hutang_bunga) || (t.is_pinjam && t.pinjam_bunga)) ? '' : 'none';
 
-      document.getElementById('modal-overlay').classList.add('open');
-    }
+  if (t.is_hutang) {
+    document.getElementById('modal-hutang-to').textContent = t.hutang_to || '—';
+    document.getElementById('modal-due').textContent = t.hutang_due || '—';
+    document.getElementById('modal-bunga').textContent = (t.hutang_bunga || 0) + '%';
+  }
+  if (t.is_pinjam) {
+    document.getElementById('modal-pinjam-from').textContent = t.pinjam_from || '—';
+    document.getElementById('modal-due').textContent = t.pinjam_due || '—';
+    document.getElementById('modal-bunga').textContent = (t.pinjam_bunga || 0) + '%';
+  }
 
-    function handleOverlayClick(e) {
-      if (e.target === document.getElementById('modal-overlay')) closeModal();
-    }
-    function closeModal() {
-      document.getElementById('modal-overlay').classList.remove('open');
-      selectedIdx = null;
-    }
+  document.getElementById('modal-overlay').classList.add('open');
+}
 
-    function deleteTransaction() {
-      if (selectedIdx === null) return;
-      const t = db.transactions[selectedIdx];
-      if (!confirm(`Hapus "${t.item}"?`)) return;
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
 
-      if (t.type === 'income') db.current_balance -= t.amount;
-      else db.current_balance += t.amount;
-      if (t.is_hutang && !t.hutang_lunas) db.pending_debt = Math.max(0, db.pending_debt - t.amount);
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  selectedIdx = null;
+}
 
-      db.transactions.splice(selectedIdx, 1);
-      save(); closeModal(); render();
-      toast('Transaksi dihapus');
-    }
+function deleteTransaction() {
+  if (selectedIdx === null) return;
+  const t = db.transactions[selectedIdx];
+  if (!confirm(`Hapus "${t.item}"?`)) return;
 
-    /* ═══════════════════════════════
-       RESET
-    ═══════════════════════════════ */
-    function resetAll() {
-      if (!confirm('Reset semua data? Tidak bisa di-undo!')) return;
-      localStorage.removeItem('survivalbot');
-      location.reload();
-    }
+  if (t.is_hutang && !t.hutang_lunas) db.pending_debt = Math.max(0, db.pending_debt - t.amount);
+  else if (t.is_pinjam) db.current_balance -= t.amount;
+  else if (t.type === 'income') db.current_balance -= t.amount;
+  else db.current_balance += t.amount;
 
-    /* ═══════════════════════════════
-       UTILS
-    ═══════════════════════════════ */
-    function esc(s) {
-      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+  db.transactions.splice(selectedIdx, 1);
+  save();
+  closeModal();
+  render();
+  toast('Dihapus');
+}
 
-    let _toastTimer;
-    function toast(msg) {
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(_toastTimer);
-      _toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
-    }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-    boot();
-  </script>
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+boot();
+</script>
 </body>
-
 </html>
